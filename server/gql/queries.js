@@ -10,6 +10,7 @@ import { purchasedProductQueries } from '@gql/models/purchasedProducts';
 import { storeProductQueries } from '@gql/models/storeProducts';
 import { storeQueries } from '@gql/models/stores';
 import { supplierQueries } from '@gql/models/suppliers';
+import { phoneNumberQueries } from '@gql/models/phoneNumbers';
 import { supplierProductQueries } from '@gql/models/supplierProducts';
 import { userQueries } from '@gql/models/users';
 
@@ -23,7 +24,8 @@ const DB_TABLES = {
   store: storeQueries,
   supplier: supplierQueries,
   supplierProduct: supplierProductQueries,
-  user: userQueries
+  user: userQueries,
+  phoneNumber: phoneNumberQueries
 };
 
 export const addQueries = () => {

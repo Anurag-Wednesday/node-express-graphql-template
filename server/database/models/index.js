@@ -17,6 +17,7 @@ db.users = require('@database/models/users').model(sequelize, Sequelize.DataType
 db.purchasedProducts = require('@database/models/purchased_products').model(sequelize, Sequelize.DataTypes);
 db.storeProducts = require('@database/models/store_products').model(sequelize, Sequelize.DataTypes);
 db.supplierProducts = require('@database/models/supplier_products').model(sequelize, Sequelize.DataTypes);
+db.phoneNumbers = require('@database/models/phone_numbers').model(sequelize, Sequelize.DataTypes);
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
