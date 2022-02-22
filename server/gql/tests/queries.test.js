@@ -7,7 +7,16 @@ import { QueryRoot } from '../queries';
 import { MutationRoot } from '../mutations';
 
 const schema = new GraphQLSchema({ query: QueryRoot, mutation: MutationRoot });
-const allModels = ['address', 'product', 'purchasedProduct', 'storeProduct', 'store', 'supplierProduct', 'supplier'];
+const allModels = [
+  'address',
+  'product',
+  'purchasedProduct',
+  'storeProduct',
+  'phoneNumber',
+  'store',
+  'supplierProduct',
+  'supplier'
+];
 
 allModels.forEach(model => allModels.push(pluralize(model)));
 

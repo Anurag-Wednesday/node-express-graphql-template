@@ -119,6 +119,28 @@
       "response": []
     },
     {
+      "name": "PhoneNumbers",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "graphql",
+          "graphql": {
+            "query": "query PhoneNumbers {\n  phoneNumbers (first:10){\n    edges {\n      node {\n        id\n        number\n        addressId\n        address {\n          edges {\n            node {\n              id\n              address1\n            }\n          }\n        }\n  }\n }\n }\n }",
+            "variables": ""
+          }
+        },
+        "url": {
+          "raw": "http://localhost:9000/graphql",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "9000",
+          "path": ["graphql"]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "Stores",
       "request": {
         "method": "POST",
