@@ -100,6 +100,16 @@ module.exports = (options = {}) => ({
             limit: 10000
           }
         }
+      },
+      {
+        test: /node_modules\/bull\/lib\/commands\/index\.js$/,
+        use: {
+          loader: 'string-replace-loader',
+          options: {
+            search: '__dirname',
+            replace: `"${path.dirname(require.resolve('bull'))}/lib/commands"`
+          }
+        }
       }
     ]
   },
