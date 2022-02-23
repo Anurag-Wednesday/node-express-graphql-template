@@ -7,3 +7,4 @@ CREATE TABLE phone_numbers (
     deleted_at timestamp WITH time zone,
     CONSTRAINT suppliers_address_id FOREIGN KEY (address_id) REFERENCES addresses (id)
 );
+CREATE INDEX address_id ON phone_numbers USING btree (address_id);
