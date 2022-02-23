@@ -27,6 +27,9 @@ module.exports = (options = {}) => ({
   mode: options.mode,
   entry: options.entry,
   optimization: options.optimization,
+  externals: {
+    bull: 'commonjs2 bull'
+  },
   module: {
     rules: [
       {
@@ -98,6 +101,16 @@ module.exports = (options = {}) => ({
           loader: 'url-loader',
           options: {
             limit: 10000
+          }
+        }
+      },
+      {
+        test: /node_modules\/bull\/lib\/commands\/index\.js$/,
+        use: {
+          loader: 'string-replace-loader',
+          options: {
+            search: '__dirname',
+            replace: `"${path.dirname(require.resolve('bull'))}/lib/commands"`
           }
         }
       }

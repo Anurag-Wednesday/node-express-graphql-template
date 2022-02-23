@@ -10,6 +10,7 @@ import { phoneNumberMutations } from '@gql/models/phoneNumbers';
 import { storeProductMutations } from '@gql/models/storeProducts';
 import { supplierProductMutations } from '@gql/models/supplierProducts';
 import { userMutations } from '@gql/models/users';
+import { scheduleJob } from '@gql/custom/scheduleJobMutation';
 import { MUTATION_TYPE } from '@utils/constants';
 
 const shouldNotAddMutation = (type, table) => {
@@ -76,6 +77,7 @@ export const addMutations = () => {
         resolve: createResolvers(DB_TABLES[table].model).deleteResolver
       };
     }
+    mutations.scheduleJob = scheduleJob;
   });
   return mutations;
 };
