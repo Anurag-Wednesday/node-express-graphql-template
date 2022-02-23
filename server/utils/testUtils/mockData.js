@@ -54,6 +54,11 @@ export const suppliersTable = range(1, 10).map((_, index) => ({
   name: faker.company.companyName(),
   addressId: index + 1
 }));
+export const phoneNumbersTable = range(1, 10).map((_, index) => ({
+  id: (index + 1).toString(),
+  number: faker.phone.phoneNumber(),
+  addressId: index + 1
+}));
 
 export const supplierProductsTable = range(1, 10).map((_, index) => ({
   id: (index + 1).toString(),
