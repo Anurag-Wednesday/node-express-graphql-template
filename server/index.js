@@ -3,6 +3,7 @@ import { graphqlHTTP } from 'express-graphql';
 import { GraphQLSchema } from 'graphql';
 import dotenv from 'dotenv';
 import multer from 'multer';
+import { initQueues } from '@utils/queue';
 import rTracer from 'cls-rtracer';
 import bodyParser from 'body-parser';
 import { connect } from '@database';
@@ -74,6 +75,7 @@ export const init = () => {
   /* istanbul ignore next */
   if (!isTestEnv()) {
     app.listen(9000);
+    initQueues();
   }
 };
 

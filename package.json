@@ -43,7 +43,7 @@
     "@babel/preset-flow": "^7.12.1",
     "aws-sdk": "^2.949.0",
     "babel-eslint": "^10.1.0",
-    "bull": "^4.6.1",
+    "bull": "^4.6.2",
     "cls-rtracer": "^2.6.0",
     "crypto": "^1.0.1",
     "deep-map-keys": "^2.0.1",
