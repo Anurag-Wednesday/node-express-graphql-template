@@ -1,13 +1,18 @@
 import Bull from 'bull';
 import moment from 'moment';
+import { pubsub } from '@utils/pubsub';
+import { SUBSCRIPTION_TOPICS } from '@utils/constants';
+
 const queues = {};
 // 1
 export const QUEUE_NAMES = {
   MIDNIGHT_CRON: 'midnightCron',
-  SCHEDULE_JOB: 'scheduleJob'
+  SCHEDULE_JOB: 'scheduleJob',
+  EVERY_MINUTE_CRON: 'everyMinuteCron'
 };
 const CRON_EXPRESSIONS = {
-  MIDNIGHT: '0 0 * * *'
+  MIDNIGHT: '0 0 * * *',
+  EVERY_MINUTE: '* * * * *'
 };
 // 2
 export const QUEUE_PROCESSORS = {
@@ -21,21 +26,29 @@ export const QUEUE_PROCESSORS = {
     console.log({ job, done });
     console.log(`${moment()}::The MIDNIGHT_CRON is being executed at 12:00am`);
     done();
+  },
+  [QUEUE_NAMES.EVERY_MINUTE_CRON]: (job, done) => {
+    console.log(`publishing to ${SUBSCRIPTION_TOPICS.NOTIFICATIONS}`);
+    pubsub.publish(SUBSCRIPTION_TOPICS.NOTIFICATIONS, {
+      notifications: {
+        message: 'This message is from the CRON',
+        scheduleIn: 0
+      }
+    });
+    done();
   }
 };
 
 // 3
 export const initQueues = () => {
-  console.log('init queues');
+  console.log(' init queues');
   Object.keys(QUEUE_PROCESSORS).forEach(queueName => {
-    // 4
     queues[queueName] = getQueue(queueName);
-    // 5
     queues[queueName].process(QUEUE_PROCESSORS[queueName]);
-    if (queues[queueName].name === 'midnightCron') {
-      queues[QUEUE_NAMES.MIDNIGHT_CRON].add({}, { repeat: { cron: CRON_EXPRESSIONS.MIDNIGHT } });
-    }
   });
+
+  queues[QUEUE_NAMES.MIDNIGHT_CRON].add({}, { repeat: { cron: CRON_EXPRESSIONS.MIDNIGHT } });
+  queues[QUEUE_NAMES.EVERY_MINUTE_CRON].add({}, { repeat: { cron: CRON_EXPRESSIONS.EVERY_MINUTE } });
 };
 export const getQueue = queueName => {
   if (!queues[queueName]) {

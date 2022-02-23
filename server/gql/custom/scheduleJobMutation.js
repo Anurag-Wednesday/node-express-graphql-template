@@ -1,6 +1,8 @@
 import { GraphQLNonNull, GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLBoolean } from 'graphql';
 import moment from 'moment';
 import { getQueue, QUEUE_NAMES } from '@utils/queue';
+import { pubsub } from '@utils/pubsub';
+import { SUBSCRIPTION_TOPICS } from '@utils/constants';
 
 export const scheduleJob = {
   type: new GraphQLObjectType({
@@ -27,8 +29,10 @@ export const scheduleJob = {
     return getQueue(QUEUE_NAMES.SCHEDULE_JOB)
       .add({ message: args.message }, { delay: args.scheduleIn })
       .then(job => {
-        // 2
         console.log(`${moment()}::Job with id: ${job.id} scheduled in ${args.scheduleIn} milliseconds`);
+        pubsub.publish(SUBSCRIPTION_TOPICS.NOTIFICATIONS, {
+          notifications: args
+        });
         return { success: true };
       })
       .catch(err => {
