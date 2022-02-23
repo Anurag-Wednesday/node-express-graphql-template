@@ -7,7 +7,7 @@ export const QUEUE_NAMES = {
   SCHEDULE_JOB: 'scheduleJob'
 };
 const CRON_EXPRESSIONS = {
-  MIDNIGHT: '0 0 0 * * *'
+  MIDNIGHT: '0 0 * * *'
 };
 // 2
 export const QUEUE_PROCESSORS = {
