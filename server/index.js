@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import express from 'express';
 import { graphqlHTTP } from 'express-graphql';
 import { GraphQLSchema } from 'graphql';
