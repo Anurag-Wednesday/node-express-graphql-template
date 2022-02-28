@@ -12,6 +12,7 @@ import { supplierProductMutations } from '@gql/models/supplierProducts';
 import { userMutations } from '@gql/models/users';
 import { scheduleJob } from '@gql/custom/scheduleJobMutation';
 import { MUTATION_TYPE } from '@utils/constants';
+import { customPurchaseProductsResolver } from '@gql/custom/createPurchasedProducts';
 
 const shouldNotAddMutation = (type, table) => {
   if (type === MUTATION_TYPE.CREATE) {
@@ -47,6 +48,8 @@ export const DB_TABLES = {
   phoneNumber: phoneNumberMutations
 };
 
+const customMutationTables = ['purchasedProduct'];
+
 export const addMutations = () => {
   const mutations = {};
 
@@ -54,11 +57,19 @@ export const addMutations = () => {
     const { id, ...createArgs } = DB_TABLES[table].args;
 
     if (shouldNotAddMutation(MUTATION_TYPE.CREATE, table)) {
-      mutations[`create${upperFirst(table)}`] = {
-        ...DB_TABLES[table],
-        args: createArgs,
-        resolve: createResolvers(DB_TABLES[table].model).createResolver
-      };
+      if (customMutationTables.includes(table)) {
+        mutations[`create${upperFirst(table)}`] = {
+          ...DB_TABLES[table],
+          args: createArgs,
+          resolve: customPurchaseProductsResolver(DB_TABLES[table].model).createResolver
+        };
+      } else {
+        mutations[`create${upperFirst(table)}`] = {
+          ...DB_TABLES[table],
+          args: createArgs,
+          resolve: createResolvers(DB_TABLES[table].model).createResolver
+        };
+      }
     }
 
     if (shouldNotAddMutation(MUTATION_TYPE.UPDATE, table)) {
