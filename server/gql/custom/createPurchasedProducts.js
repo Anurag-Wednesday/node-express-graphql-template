@@ -2,6 +2,7 @@ import Redis from 'ioredis';
 import moment from 'moment';
 import { client } from '@database';
 import JSONCache from 'redis-json';
+import { insertPurchasedProducts } from '@server/daos/purchasedProducts';
 
 const redis = new Redis();
 const jsonCache = new JSONCache(redis);
@@ -11,7 +12,7 @@ export const customPurchaseProductsResolver = model => ({
     const currentDate = moment().format('YYYY-MM-DD');
     const response = await client.query(`SELECT category from products where products.id = ${args.productId}`);
     const category = response[0][0].category;
-    const createdPurchasedProduct = await model.create(args);
+    const createdPurchasedProduct = await insertPurchasedProducts(args);
     const redisCategoryValue = await jsonCache.get(`${currentDate}:${category}`);
     const redisTotalValue = await jsonCache.get(`${currentDate}:total`);
     jsonCache.set(`${currentDate}:${category}`, {
