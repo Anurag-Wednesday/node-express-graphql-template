@@ -48,8 +48,12 @@ export const DB_TABLES = {
   phoneNumber: phoneNumberMutations
 };
 
-const customMutationTables = ['purchasedProduct'];
-
+const customMutationTables = {
+  purchasedProduct: {
+    table: 'purchasedProduct',
+    resolver: customPurchaseProductsResolver
+  }
+};
 export const addMutations = () => {
   const mutations = {};
 
@@ -57,11 +61,11 @@ export const addMutations = () => {
     const { id, ...createArgs } = DB_TABLES[table].args;
 
     if (shouldNotAddMutation(MUTATION_TYPE.CREATE, table)) {
-      if (customMutationTables.includes(table)) {
+      if (customMutationTables[table]) {
         mutations[`create${upperFirst(table)}`] = {
           ...DB_TABLES[table],
           args: createArgs,
-          resolve: customPurchaseProductsResolver(DB_TABLES[table].model).createResolver
+          resolve: customMutationTables[table].resolver(DB_TABLES[table].model).createResolver
         };
       } else {
         mutations[`create${upperFirst(table)}`] = {
