@@ -14,6 +14,7 @@ export const purchasedProductFields = {
   id: { type: GraphQLNonNull(GraphQLID) },
   price: { type: GraphQLInt },
   discount: { type: GraphQLInt },
+  productId: { type: GraphQLNonNull(GraphQLID) },
   deliveryDate: { type: GraphQLDateTime }
 };
 const PurchasedProduct = new GraphQLObjectType({
