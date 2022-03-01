@@ -13,13 +13,13 @@ export const customPurchaseProductsResolver = model => ({
     const response = await client.query(`SELECT category from products where products.id = ${args.productId}`);
     const category = response[0][0].category;
     const createdPurchasedProduct = await insertPurchasedProducts(args);
-    const redisCategoryValue = await jsonCache.get(`${currentDate}:${category}`);
-    const redisTotalValue = await jsonCache.get(`${currentDate}:total`);
-    jsonCache.set(`${currentDate}:${category}`, {
+    const redisCategoryValue = await jsonCache.get(`${currentDate}_${category}`);
+    const redisTotalValue = await jsonCache.get(`${currentDate}_total`);
+    jsonCache.set(`${currentDate}_${category}`, {
       total: redisCategoryValue ? redisCategoryValue.total + args.price : args.price,
       count: redisCategoryValue ? redisCategoryValue.count + 1 : 1
     });
-    jsonCache.set(`${currentDate}:total`, {
+    jsonCache.set(`${currentDate}_total`, {
       total: redisTotalValue ? redisTotalValue.total + args.price : args.price,
       count: redisTotalValue ? redisTotalValue.count + 1 : 1
     });
