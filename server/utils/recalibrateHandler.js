@@ -10,6 +10,8 @@ import {
 } from './rawQueries';
 
 export const recalibrateRedis = async (startDate, endDate) => {
+  startDate = moment(startDate).format('YYYY-MM-DD');
+  endDate = moment(endDate).format('YYYY-MM-DD');
   const redis = new Redis();
   const jsonCache = new JSONCache(redis);
   do {
@@ -17,6 +19,10 @@ export const recalibrateRedis = async (startDate, endDate) => {
     const countForDate = await getCountByDate(startDate);
     const allCategories = await getAllCategories();
     const categories = new Set(allCategories[1].rows.map(item => item.category));
+    await jsonCache.set(`${startDate}_total`, {
+      total: totalForDate[0][0].sum,
+      count: countForDate[0][0].count
+    });
     categories.forEach(async category => {
       const categoryTotal = await getTotalByDateForCategory(startDate, category);
       const categoryCount = await getCountByDateForCategory(startDate, category);
@@ -24,10 +30,6 @@ export const recalibrateRedis = async (startDate, endDate) => {
         total: categoryTotal[0][0].sum,
         count: categoryCount[0][0].count
       });
-    });
-    await jsonCache.set(`${startDate}_total`, {
-      total: totalForDate[0][0].sum,
-      count: countForDate[0][0].count
     });
     await redis.set('lastRunOn', startDate);
     startDate = moment(startDate)

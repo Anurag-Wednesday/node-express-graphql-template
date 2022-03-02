@@ -42,7 +42,7 @@ export const init = async () => {
   app.use(express.json());
   app.use(rTracer.expressMiddleware());
   app.use(cors());
-  app.use(unless(authenticateToken, '/', '/sign-in', '/sign-up', '/recalibrateRoute'));
+  app.use(unless(authenticateToken, '/', '/sign-in', '/sign-up', '/recalibrate'));
   app.use(
     '/graphql',
     graphqlHTTP({
