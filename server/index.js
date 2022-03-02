@@ -16,7 +16,7 @@ import { connect } from '@database';
 import { QueryRoot } from '@gql/queries';
 import { MutationRoot } from '@gql/mutations';
 import { isTestEnv, logger, unless } from '@utils/index';
-import { signUpRoute, signInRoute } from '@server/auth';
+import { signUpRoute, signInRoute, recalibrateRoute } from '@server/auth';
 import cluster from 'cluster';
 import os from 'os';
 import authenticateToken from '@middleware/authenticate/index';
@@ -42,7 +42,7 @@ export const init = async () => {
   app.use(express.json());
   app.use(rTracer.expressMiddleware());
   app.use(cors());
-  app.use(unless(authenticateToken, '/', '/sign-in', '/sign-up'));
+  app.use(unless(authenticateToken, '/', '/sign-in', '/sign-up', '/recalibrateRoute'));
   app.use(
     '/graphql',
     graphqlHTTP({
@@ -72,7 +72,7 @@ export const init = async () => {
       console.error(error);
     }
   };
-  createBodyParsedRoutes([signUpRoute, signInRoute]);
+  createBodyParsedRoutes([signUpRoute, signInRoute, recalibrateRoute]);
 
   app.use('/', (req, res) => {
     const message = 'Service up and running!';

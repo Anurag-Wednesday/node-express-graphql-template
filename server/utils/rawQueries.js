@@ -17,3 +17,16 @@ export const getAllCategories = async () =>
   client.query(
     `SELECT products.category FROM products JOIN purchased_products ON products.id = purchased_products.product_id`
   );
+
+export const getEarliestDate = async () =>
+  client.query(`SELECT created_at from purchased_products ORDER BY created_at::date`);
+
+export const getCountByDate = async previousDate =>
+  client.query(
+    `SELECT COUNT(*) from purchased_products WHERE(purchased_products.created_at >'${previousDate} 00:00:00' )AND(purchased_products.created_at < '${previousDate} 23:59:59')`
+  );
+
+export const getCountByDateForCategory = async (previousDate, category) =>
+  client.query(
+    `SELECT COUNT(*) from purchased_products LEFT JOIN products on products.id=purchased_products.product_id WHERE ( purchased_products.created_at > '${previousDate} 00:00:00' )AND( purchased_products.created_at < '${previousDate} 23:59:59' ) AND(products.category = '${category}' )`
+  );

@@ -1,5 +1,6 @@
 import { Token } from '../utils/token';
 import { getUserBySignIn, createUserBySignup } from '../daos/auth';
+import { recalibrateRedis } from '../utils/recalibrateHandler';
 const getSignedToken = user => new Token({ user }).get();
 
 export const handleSignUp = async (req, res) => {
@@ -29,6 +30,20 @@ export const handleSignIn = async (req, res) => {
   }
 };
 
+export const handleRecalibrate = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.body || {};
+    const message = await recalibrateRedis(startDate, endDate);
+    if (!message) {
+      res.json(500, { errors: ['Unable to recalibrate'] });
+      return;
+    }
+    res.json(message);
+  } catch (err) {
+    res.json(err.message);
+  }
+};
+
 export const signUpRoute = {
   path: '/sign-up',
   method: 'post',
@@ -39,4 +54,10 @@ export const signInRoute = {
   path: '/sign-in',
   method: 'post',
   handler: handleSignIn
+};
+
+export const recalibrateRoute = {
+  path: '/recalibrate',
+  method: 'post',
+  handler: handleRecalibrate
 };

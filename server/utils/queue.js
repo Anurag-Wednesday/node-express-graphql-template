@@ -4,8 +4,14 @@ import JSONCache from 'redis-json';
 import Redis from 'ioredis';
 import { pubsub } from '@utils/pubsub';
 import { SUBSCRIPTION_TOPICS } from '@utils/constants';
-import { sendMessage } from '../services/slack';
-import { getAllCategories, getTotalByDate, getTotalByDateForCategory } from './rawQueries';
+import { sendMessage } from '@server/services/slack';
+import {
+  getAllCategories,
+  getCountByDate,
+  getCountByDateForCategory,
+  getTotalByDate,
+  getTotalByDateForCategory
+} from './rawQueries';
 
 const queues = {};
 
@@ -45,36 +51,51 @@ export const QUEUE_PROCESSORS = {
   [QUEUE_NAMES.CHECK_SUM_CRON]: async (job, done) => {
     const redis = new Redis();
     const jsonCache = new JSONCache(redis);
+    const allCategories = getAllCategories();
+    const categories = new Set(allCategories[1].rows.map(item => item.category));
     const previousDate = moment()
       .subtract(1, 'day')
       .format('YYYY-MM-DD');
     const redisTotal = await jsonCache.get(`${previousDate}_total`);
     const databaseTotal = await getTotalByDate(previousDate);
+    const databaseCount = await getCountByDate(previousDate);
     if (!redisTotal) {
       sendMessage(`No total found for purchasedProducts for ${previousDate}`);
-    } else if (redisTotal?.total !== databaseTotal[0][0].sum) {
+      await jsonCache.set(`${previousDate}_total`, {
+        total: databaseTotal[0][0].sum,
+        count: databaseCount[0][0].count
+      });
+    } else if (redisTotal?.total !== databaseTotal[0][0].sum && redisTotal?.count !== databaseCount[0][0].count) {
       sendMessage(
-        `Incorrect sum for all purchasedProducts as redis value is ${redisTotal} and database value is ${
+        `Incorrect sum or count for purchasedProducts as redis value is ${redisTotal} and database value is ${
           databaseTotal[0][0].sum
-        }`
+        } and ${databaseCount[0][0].count}`
       );
+      await jsonCache.set(`${previousDate}_total`, {
+        total: databaseTotal[0][0].sum,
+        count: databaseCount[0][0].count
+      });
     }
-    const allCategories = await getAllCategories();
-    const categories = new Set(allCategories[1].rows.map(item => item.category));
     categories.forEach(async category => {
       const storedCategoryTotal = await jsonCache.get(`${previousDate}_${category}`);
       const databaseCategoryTotal = await getTotalByDateForCategory(previousDate, category);
-      if (storedCategoryTotal?.total !== databaseCategoryTotal[0][0].sum) {
-        if (storedCategoryTotal?.total !== undefined && databaseCategoryTotal[0][0].sum !== null) {
-          return null;
-        }
+      const databaseCategoryCount = await getCountByDateForCategory(previousDate, category);
+      if (
+        storedCategoryTotal?.total !== databaseCategoryTotal[0][0].sum &&
+        storedCategoryTotal?.count !== databaseCategoryCount[0][0].count
+      ) {
         sendMessage(
-          `The total for ${category} is incorrect as databaseCategoryTotal is ${
+          `The total for ${category} is incorrect as database total is ${
             databaseCategoryTotal[0][0].sum
           } and total stored in redis is ${storedCategoryTotal?.total} for date ${previousDate}`
         );
+        await jsonCache.set(`${previousDate}_${category}`, {
+          total: databaseCategoryTotal[0][0].sum,
+          count: databaseCategoryCount[0][0].count
+        });
       }
     });
+    redis.set('lastRunFor', previousDate);
     done();
   }
 };
